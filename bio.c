@@ -26,7 +26,8 @@
 #include "fs.h"
 #include "buf.h"
 
-struct {
+struct
+{
   struct spinlock lock;
   struct buf buf[NBUF];
 
@@ -38,15 +39,15 @@ struct {
 void
 binit(void)
 {
-  struct buf *b;
+  struct buf* b;
 
   initlock(&bcache.lock, "bcache");
 
-//PAGEBREAK!
-  // Create linked list of buffers
+  // PAGEBREAK!
+  //  Create linked list of buffers
   bcache.head.prev = &bcache.head;
   bcache.head.next = &bcache.head;
-  for(b = bcache.buf; b < bcache.buf+NBUF; b++){
+  for (b = bcache.buf; b < bcache.buf + NBUF; b++) {
     b->next = bcache.head.next;
     b->prev = &bcache.head;
     initsleeplock(&b->lock, "buffer");
@@ -61,13 +62,13 @@ binit(void)
 static struct buf*
 bget(uint dev, uint blockno)
 {
-  struct buf *b;
+  struct buf* b;
 
   acquire(&bcache.lock);
 
   // Is the block already cached?
-  for(b = bcache.head.next; b != &bcache.head; b = b->next){
-    if(b->dev == dev && b->blockno == blockno){
+  for (b = bcache.head.next; b != &bcache.head; b = b->next) {
+    if (b->dev == dev && b->blockno == blockno) {
       b->refcnt++;
       release(&bcache.lock);
       acquiresleep(&b->lock);
@@ -78,8 +79,8 @@ bget(uint dev, uint blockno)
   // Not cached; recycle an unused buffer.
   // Even if refcnt==0, B_DIRTY indicates a buffer is in use
   // because log.c has modified it but not yet committed it.
-  for(b = bcache.head.prev; b != &bcache.head; b = b->prev){
-    if(b->refcnt == 0 && (b->flags & B_DIRTY) == 0) {
+  for (b = bcache.head.prev; b != &bcache.head; b = b->prev) {
+    if (b->refcnt == 0 && (b->flags & B_DIRTY) == 0) {
       b->dev = dev;
       b->blockno = blockno;
       b->flags = 0;
@@ -96,10 +97,10 @@ bget(uint dev, uint blockno)
 struct buf*
 bread(uint dev, uint blockno)
 {
-  struct buf *b;
+  struct buf* b;
 
   b = bget(dev, blockno);
-  if((b->flags & B_VALID) == 0) {
+  if ((b->flags & B_VALID) == 0) {
     iderw(b);
   }
   return b;
@@ -107,9 +108,9 @@ bread(uint dev, uint blockno)
 
 // Write b's contents to disk.  Must be locked.
 void
-bwrite(struct buf *b)
+bwrite(struct buf* b)
 {
-  if(!holdingsleep(&b->lock))
+  if (!holdingsleep(&b->lock))
     panic("bwrite");
   b->flags |= B_DIRTY;
   iderw(b);
@@ -118,9 +119,9 @@ bwrite(struct buf *b)
 // Release a locked buffer.
 // Move to the head of the MRU list.
 void
-brelse(struct buf *b)
+brelse(struct buf* b)
 {
-  if(!holdingsleep(&b->lock))
+  if (!holdingsleep(&b->lock))
     panic("brelse");
 
   releasesleep(&b->lock);
@@ -136,9 +137,8 @@ brelse(struct buf *b)
     bcache.head.next->prev = b;
     bcache.head.next = b;
   }
-  
+
   release(&bcache.lock);
 }
-//PAGEBREAK!
-// Blank page.
-
+// PAGEBREAK!
+//  Blank page.
