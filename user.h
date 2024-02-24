@@ -44,6 +44,8 @@ int
 sleep(int);
 int
 uptime(void);
+int
+gettime(struct rtcdate*);
 
 // ulib.c
 int
