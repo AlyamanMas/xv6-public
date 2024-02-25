@@ -440,3 +440,28 @@ sys_pipe(void)
   fd[1] = fd1;
   return 0;
 }
+
+int
+sys_lseek(void)
+{
+  struct file* f;
+  uint offset, seektype;
+  if (argfd(0, 0, &f) < 0 || argint(1, (int*)&offset) < 0 ||
+      argint(2, (int*)&seektype) < 0)
+    return -1;
+
+  switch (seektype) {
+    case 0:
+      f->off = offset;
+      break;
+    case 1:
+      f->off += offset;
+      break;
+    case 2:
+      f->off = f->ip->size + offset;
+      break;
+    default:
+      return -2;
+  }
+  return f->off;
+}

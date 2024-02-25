@@ -1,5 +1,11 @@
 struct stat;
 struct rtcdate;
+enum SeekType
+{
+  SEEK_SET = 0,
+  SEEK_CUR = 1,
+  SEEK_END = 2
+};
 
 // system calls
 int
@@ -46,6 +52,8 @@ int
 uptime(void);
 int
 gettime(struct rtcdate*);
+int
+lseek(int, int, enum SeekType);
 
 // ulib.c
 int
