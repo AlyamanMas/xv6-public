@@ -8,6 +8,13 @@
 #include "proc.h"
 
 int
+sys_shutdown(void)
+{
+  outb(0xf4, 0x00);
+  return 0;
+}
+
+int
 sys_fork(void)
 {
   return fork();

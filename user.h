@@ -54,6 +54,8 @@ int
 gettime(struct rtcdate*);
 int
 lseek(int, int, enum SeekType);
+int
+shutdown(void);
 
 // ulib.c
 int
