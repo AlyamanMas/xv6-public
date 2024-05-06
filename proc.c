@@ -563,16 +563,14 @@ setpriority(int PID, int priority)
     priority = 5;
   }
 
-  else {
-    acquire(&ptable.lock);
-    for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
-      if (p->pid == PID) {
-        p->priority = priority;
-        break;
-      }
+  acquire(&ptable.lock);
+  for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
+    if (p->pid == PID) {
+      p->priority = priority;
+      break;
     }
-    release(&ptable.lock);
   }
+  release(&ptable.lock);
   return priority;
 }
 
@@ -582,7 +580,7 @@ printptable()
   struct proc* p;
   sti();
   acquire(&ptable.lock);
-  cprintf("pName \t pID \t Status \t priority \n");
+  cprintf("PName \t PID \t Status \t Priority \n");
   for (p = ptable.proc; p < &ptable.proc[NPROC]; p++) {
     switch (p->state) {
       case RUNNING:
