@@ -3,7 +3,9 @@
 #include "user.h"
 #include "fcntl.h"
 
-int main(){
-    printptable();
-    exit();
+int
+main()
+{
+  printptable();
+  exit();
 }

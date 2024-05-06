@@ -4,10 +4,10 @@
 #include "fcntl.h"
 
 int
-main(int argc, char *argv[])
+main(int argc, char* argv[])
 {
   int priority, pid;
-  if(argc < 3){
+  if (argc < 3) {
     exit();
   }
   pid = atoi(argv[1]);
