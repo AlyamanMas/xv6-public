@@ -95,6 +95,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
   p->priority = 3; // default priority
+  p->decay_counter = 0;
 
   release(&ptable.lock);
 
@@ -355,6 +356,13 @@ scheduler(void)
           highest_proc = temp_proc;
       }
       p = highest_proc;
+      if (p->priority < 3) {
+        p->decay_counter++;
+      }
+      if (p->decay_counter >= RUN_TIMES_TO_DECAY) {
+        p->decay_counter = 0;
+        p->priority++;
+      }
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.

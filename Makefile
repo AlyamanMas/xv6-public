@@ -185,6 +185,7 @@ UPROGS=\
 	_printptable_user\
 	_test_part1\
 	_test_priority\
+	_test_decay\
 
 fs.img: mkfs README $(UPROGS)
 	./mkfs fs.img README $(UPROGS)
@@ -261,6 +262,7 @@ EXTRA=\
 	printptable.c\
 	test_part1.c\
 	test_priority.c\
+	test_decay.c\
 
 dist:
 	rm -rf dist
