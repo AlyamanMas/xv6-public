@@ -330,7 +330,6 @@ void
 scheduler(void)
 {
   struct proc *p, *temp_proc;
-  ;
   struct cpu* c = mycpu();
   c->proc = 0;
 
