@@ -24,11 +24,8 @@ main(void)
     {
       printf(1, "Child: %d is created\n", getpid());
       printptable();
-      for (int z = 0; z < 1000000000;
-           z++) // if one more zero is added the program won't work
-        y = y + 35.3 * 5.1 / 65.23;
-      break;
-      sleep(500);
+      sleep(200);
+      exit();
     }
   }
   for (int i = 0; i < 3; ++i) {
