@@ -88,6 +88,7 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  p->priority = 3; // default priority
 
   release(&ptable.lock);
 
@@ -322,20 +323,29 @@ wait(void)
 void
 scheduler(void)
 {
-  struct proc *p;
+  struct proc *p, *temp_proc;;
   struct cpu *c = mycpu();
   c->proc = 0;
   
   for(;;){
     // Enable interrupts on this processor.
     sti();
-
+    struct proc *highest_proc;
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
         continue;
 
+      //newly added block of code to choose process with highest priority(5 low - 1 high)
+      highest_proc = p;
+      for(temp_proc = ptable.proc; temp_proc < &ptable.proc[NPROC]; temp_proc++){
+        if(temp_proc->state != RUNNABLE)
+            continue;
+        if(highest_proc->priority > temp_proc->priority)//to choos min priority
+            highest_proc = temp_proc;
+      }
+      p = highest_proc;
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -531,4 +541,52 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+int
+setpriority(int PID, int priority)
+{
+	struct proc *p;
+    if(priority < 0 || priority > 5){
+        priority = 5;
+    }
+
+    else{
+    acquire(&ptable.lock);
+	for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+	  if(p->pid == PID){
+			p->priority = priority;
+			break;
+		}
+	}
+	release(&ptable.lock);
+    }
+	return priority;
+}
+
+int
+printptable()
+{
+struct proc *p;
+sti();
+acquire(&ptable.lock);
+cprintf ("pName \t pID \t Status \t priority \n");
+for (p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    switch(p->state){
+    case RUNNING: cprintf ("%s  \t| %d \t| RUNNING \t| %d \n", p->name, p->pid,p->priority);
+  		break;
+  	case EMBRYO: cprintf ("%s \t| %d \t| EMBRYO  \t| %d \n", p->name, p->pid,p->priority);
+  		break;
+  	case SLEEPING: cprintf ("%s \t| %d \t| SLEEPING \t| %d \n", p->name, p->pid,p->priority);
+  		break;
+  	case RUNNABLE: cprintf ("%s \t| %d \t| RUNNABLE \t| %d \n", p->name, p->pid,p->priority);
+  		break;
+  	case ZOMBIE: cprintf ("%s \t| %d \t| ZOMBIE \t| %d \n", p->name, p->pid,p->priority);
+  		break;
+    default: continue;
+        break;
+  	}
+  }
+release(&ptable.lock);
+return 22;
 }
